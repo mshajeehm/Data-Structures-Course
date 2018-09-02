@@ -32,37 +32,30 @@ ull polyHash(const string& s, const int& x, const ull& p)
 	return pHash;
 }
 
-std::vector<long long> preComputeHash(const string& s, const int substringSize, const int& x, const ull& p)
+std::vector<ull> preComputeHash(const string& s, const int substringSize, const int& x, const ull& p)
 {
 	///////////calculating polynomial Hash //////////////////////
 	int textLength = s.size();
-	std::vector< long long> H(textLength - substringSize + 1);
+	std::vector< ull> H(textLength - substringSize + 1);
 	string lastsubstring = s.substr(textLength - substringSize, substringSize);   //need to find other way instead of substring
 
 	H[textLength - substringSize] = polyHash(lastsubstring, x, p);
 	ull y = 1;
 	for (ull i = 0; i < substringSize; i++)
-	{
 		y = y*x % p;
-	}
+
 	for (long long i = textLength - substringSize - 1; i >= 0; i--)
-	{
-		H[i] = (x*H[i + 1] + s[i] - y * s[i + substringSize]);// % p) + p) % p;
-		while (H[i] < 0) {
-			H[i] += p * 100;
-		}
-		H[i] = H[i] % p;
-	}
+		H[i] = (x*H[i + 1] + s[i] - (y * s[i + substringSize] % p) + p) % p;
+
 	return H;
 }
 
 bool isEqual(string s1, string s2) {
 	if (s1.size() != s2.size())
 		return false;
-	for (int i = 0; i < s1.size(); ++i) {
+	for (int i = 0; i < s1.size(); ++i) 
 		if (s1[i] != s2[i])
 			return false;
-	}
 	return true;
 }
 
@@ -82,7 +75,7 @@ std::vector<ull> get_occurrences_MSM(const Data& input) {
 	std::vector<ull> ans;
 
 	ull pHash = polyHash(input.pattern, multiplier, prime);
-	std::vector< long long> PreComputedHashes = preComputeHash(input.text, input.pattern.size(), multiplier, prime);
+	std::vector< ull> PreComputedHashes = preComputeHash(input.text, input.pattern.size(), multiplier, prime);
 
 	for (ull i = 0; i + p.size() <= t.size(); ++i)
 	{
@@ -98,6 +91,5 @@ int main() {
 	std::ios_base::sync_with_stdio(false);
 	//print_occurrences(get_occurrences(read_input()));
 	print_occurrences(get_occurrences_MSM(read_input()));
-	int a; std::cin >> a;
 	return 0;
 }
